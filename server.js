@@ -38,7 +38,6 @@ app.get("/api/movies/:title", async (req, res) => {
   const title = req.params.title;
 
   try {
-    // Fetch from OMDB
     const response = await axios.get(
       `http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${title}`
     );
@@ -63,18 +62,15 @@ app.get("/api/movies/:title", async (req, res) => {
   }
 });
 
-// ✅ Serve React Frontend in Production
+// ✅ Serve React Frontend (Works for Local + Vercel)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "client", "build")));
+app.use(express.static(path.join(__dirname, "client", "build")));
 
-  // 🚨 FIXED LINE (Express v5 compatible)
-  app.get("/*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-  });
-}
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+});
 
 // ✅ Start Server
 app.listen(PORT, () => {
